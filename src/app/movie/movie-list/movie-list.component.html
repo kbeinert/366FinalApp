@@ -1,1 +1,17 @@
-<p>movie-list works!</p>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <div class="row pad-left-right">
+      <span class="pull-left title">Movies</span>
+      <a class="btn btn-success pull-right" routerLink="new">Add Movie</a>
+    </div>
+  </div>
+  <div class="panel-body">
+    <div class="center-panel">
+      <app-movie-item
+      *ngFor="let movie of movies"
+      [movie]="movie">
+    </app-movie-item>
+    </div>
+  </div>
+
+</div>
