@@ -14,6 +14,7 @@ import { MovieDetailComponent } from './movie/movie-detail/movie-detail.componen
 import { WindRefService } from './wind-ref.service';
 import { DropdownDirective } from './movie/dropdown.directive';
 import { AppRoutingModule } from './app-routing.module';
+import { MovieViewComponent } from './movie/movie-view/movie-view.component';
 
 
 @NgModule({
@@ -25,7 +26,8 @@ import { AppRoutingModule } from './app-routing.module';
     MovieEditComponent,
     MovieItemComponent,
     MovieDetailComponent,
-    DropdownDirective
+    DropdownDirective,
+    MovieViewComponent
   ],
   imports: [
     BrowserModule,
