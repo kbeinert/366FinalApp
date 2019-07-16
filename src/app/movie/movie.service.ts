@@ -2,10 +2,16 @@ import { Injectable } from '@angular/core';
 import { Movie } from './movie.model';
 import { Subject } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { Post } from './movie.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+
+@Injectable({providedIn: 'root'})
+export class  PostsService{
+  private posts: Post[] = [];
+  private postsUpdated = new Subject<Post []>();
+
+  constructor(private http: HttpClient) {}
+}
 export class MovieService {
 
   constructor(private http: HttpClient) { }
@@ -18,7 +24,7 @@ export class MovieService {
 
   getMovies() {
     this.http
-    .get<Movie[]>('link to database')
+    .get<Movie[]>('https://localhost:3000/movies')
     .subscribe((movies: Movie[]) => {
       this.movies = movies;
       this.maxMovieId = this.getMaxID();
@@ -100,7 +106,7 @@ export class MovieService {
     let header = new HttpHeaders();
     header.set('Content-Type', 'application/json');
     this.http
-    .put('link to database', json, {
+    .put('https://localhost:3000/movies', json, {
       headers: header
     }).subscribe(() => {
       this.movieListChangedEvent.next(this.movies.slice());

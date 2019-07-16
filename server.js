@@ -1,52 +1,74 @@
-const app = require("./backend/app");
-const debug = require("debug")("node-angular");
-const http = require("http");
+// Get dependencies
+var express = require('express');
+var path = require('path');
+var http = require('http');
+var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
+var mongoose = require('mongoose');
 
-const normalizePort = val => {
-  var port = parseInt(val, 10);
+// import the routing file to handle the default (index) route
+var index = require('./backend/routes/app');
 
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
+// ... ADD CODE TO IMPORT YOUR ROUTING FILES HERE ... 
 
-  if (port >= 0) {
-    // port number
-    return port;
-  }
+// establish a connection to the mongo database
+// *** Important *** change yourPort and yourDatabase
+//     to those used by your database
+mongoose.connect('mongodb://localhost:27017/Final',
+    { useNewUrlParser: true }, (err, res) => {
+        if (err) {
+            console.log('Connection failed ' + err);
+        }
+        else {
+            console.log('Connected to database!');
+        }
+    }
+);
 
-  return false;
-};
+var app = express(); // create an instance of express
 
-const onError = error => {
-  if (error.syscall !== "listen") {
-    throw error;
-  }
-  const bind = typeof port === "string" ? "pipe " + port : "port " + port;
-  switch (error.code) {
-    case "EACCES":
-      console.error(bind + " requires elevated privileges");
-      process.exit(1);
-      break;
-    case "EADDRINUSE":
-      console.error(bind + " is already in use");
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
-};
+// Tell express to use the following parsers for POST data
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 
-const onListening = () => {
-  const addr = server.address();
-  const bind = typeof port === "string" ? "pipe " + port : "port " + port;
-  debug("Listening on " + bind);
-};
+app.use(logger('dev')); // Tell express to use the Morgan logger
 
-const port = normalizePort(process.env.PORT || "3000");
-app.set("port", port);
+// Tell express to use the specified director as the
+// root directory for your web site
+app.use(express.static(path.join(__dirname, 'dist/final-app')));
 
+// Tell express to map the default route ("/") to the index route
+app.use('/', index);
+
+// ... ADD YOUR CODE TO MAP YOUR URL'S TO ROUTING FILES HERE ...
+
+// Tell express to map all other non-defined routes back to the index page
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist/final-app/index.html'));
+});
+
+//add support for CORS
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PATCH, DELETE, OPTIONS"
+  );
+  next();
+});
+
+// Define the port address and tell express to use this port
+const port = process.env.PORT || '3000';
+app.set('port', port);
+
+// Create HTTP server.
 const server = http.createServer(app);
-server.on("error", onError);
-server.on("listening", onListening);
-server.listen(port);
+
+// Tell the server to start listening on the provided port
+server.listen(port, function() {console.log("API running on localhost: " + port)});

@@ -42,7 +42,7 @@ export class MovieEditComponent implements OnInit {
     const values = form.value;
     console.log(values);
          
-    var newMovie = new Movie(null, values.movieTitle, values.movieDescription, values.movieURL, null, null);
+    var newMovie = new Movie(null, values.movieTitle, values.movieDescription, null);
          
     if (this.editMode == true) {
       this.movieService.updateMovie(this.originalMovie, newMovie);

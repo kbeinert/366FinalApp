@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Movie } from '../movie.model';
 import { MovieService } from '../movie.service';
-import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -9,12 +8,11 @@ import { Subscription } from 'rxjs';
   templateUrl: './movie-list.component.html',
   styleUrls: ['./movie-list.component.css']
 })
-export class MovieListComponent implements OnInit {
+export class MovieListComponent implements OnInit, OnDestroy {
   movies: Movie[] = [];
-  subscription: Subscription;
+  private subscription: Subscription;
   
-  constructor(private movieService: MovieService) {
-  
+  constructor(private movieService: MovieService) {  
   }
 
   ngOnInit() {
@@ -25,7 +23,7 @@ export class MovieListComponent implements OnInit {
       })
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(){
     this.subscription.unsubscribe();
   }
 }
