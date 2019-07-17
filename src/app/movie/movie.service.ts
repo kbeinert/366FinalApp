@@ -24,10 +24,9 @@ export class MovieService {
 
   getMovies() {
     this.http
-    .get<Movie[]>('https://localhost:3000/movies')
+    .get<Movie[]>('http://localhost:3000/movies')
     .subscribe((movies: Movie[]) => {
       this.movies = movies;
-      this.maxMovieId = this.getMaxID();
       this.movies.sort(compareMoviesByID);
       this.movieListChangedEvent.next(this.movies.slice());
     }, (err: any) => {
@@ -52,9 +51,10 @@ export class MovieService {
     if (pos < 0) {
       return;
     }
+    //TODO: call http.delete
     this.movies.splice(pos, 1);
     this.moviesListClone = this.movies.slice();
-    this.storeMovies();
+    // this.storeMovies();
     this.movieListChangedEvent.next(this.moviesListClone);
   }
 
@@ -106,7 +106,7 @@ export class MovieService {
     let header = new HttpHeaders();
     header.set('Content-Type', 'application/json');
     this.http
-    .put('https://localhost:3000/movies', json, {
+    .put('http://localhost:3000/movies', json, {
       headers: header
     }).subscribe(() => {
       this.movieListChangedEvent.next(this.movies.slice());

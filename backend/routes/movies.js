@@ -29,11 +29,11 @@ router.post('/', (req, res, next) => {
   const maxMovieId = sequenceGenerator.nextId("movies");
   console.log(maxMovieId);
 
-  const document = new Document({
+  const movie = new Movie({
     id: maxMovieId,
     name: req.body.name,
     description: req.body.description,
-    url: req.body.url
+    rating: req.body.rating
   });
 
   movie.save()
@@ -49,13 +49,13 @@ router.post('/', (req, res, next) => {
 });
 
 router.put('/:id', (req, res, next) => {
-  Document.findOne({ id: req.params.id })
-    .then(document => {
+  Movie.findOne({ id: req.params.id })
+    .then(movie => {
       movie.name = req.body.name;
       movie.description = req.body.description;
-      movie.url = req.body.url;
+      movie.rating = req.body.rating;
 
-      Movie.updateOne({ id: req.params.id }, document)
+      Movie.updateOne({ id: req.params.id }, movie)
         .then(result => {
           res.status(204).json({
             message: 'Movie updated successfully'})

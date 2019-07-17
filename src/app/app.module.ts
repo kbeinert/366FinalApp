@@ -15,6 +15,7 @@ import { WindRefService } from './wind-ref.service';
 import { DropdownDirective } from './movie/dropdown.directive';
 import { AppRoutingModule } from './app-routing.module';
 import { MovieViewComponent } from './movie/movie-view/movie-view.component';
+import { MovieService } from './movie/movie.service';
 
 
 @NgModule({
@@ -37,7 +38,7 @@ import { MovieViewComponent } from './movie/movie-view/movie-view.component';
 
   
   ],
-  providers: [WindRefService],
+  providers: [WindRefService,MovieService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -9,6 +9,7 @@ var mongoose = require('mongoose');
 
 // import the routing file to handle the default (index) route
 var index = require('./backend/routes/app');
+var movies = require('./backend/routes/movies');
 
 // ... ADD CODE TO IMPORT YOUR ROUTING FILES HERE ... 
 
@@ -41,6 +42,7 @@ app.use(express.static(path.join(__dirname, 'dist/final-app')));
 
 // Tell express to map the default route ("/") to the index route
 app.use('/', index);
+app.use('/movies', movies);
 
 // ... ADD YOUR CODE TO MAP YOUR URL'S TO ROUTING FILES HERE ...
 
