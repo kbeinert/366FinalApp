@@ -42,18 +42,18 @@ export class MovieEditComponent implements OnInit {
     const values = form.value;
     console.log(values);
          
-    var newMovie = new Movie(null, values.movieTitle, values.movieDescription, null);
+    var newMovie = new Movie(null, values.name, values.description, values.rating);
          
     if (this.editMode == true) {
       this.movieService.updateMovie(this.originalMovie, newMovie);
     } else {
       this.movieService.addMovie(newMovie);
     }
-    this.router.navigate(['../'], {relativeTo: this.route});
+    this.router.navigate(['/movies']);
   }
             
   onCancel() {
-    this.router.navigate(['../'], {relativeTo: this.route});
+    this.router.navigate(['/movies']);
   }
 
 }

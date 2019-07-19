@@ -36,6 +36,20 @@ app.use(cookieParser());
 
 app.use(logger('dev')); // Tell express to use the Morgan logger
 
+//add support for CORS
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+  );
+  next();
+});
+
 // Tell express to use the specified director as the
 // root directory for your web site
 app.use(express.static(path.join(__dirname, 'dist/final-app')));
@@ -51,19 +65,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist/final-app/index.html'));
 });
 
-//add support for CORS
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PATCH, DELETE, OPTIONS"
-  );
-  next();
-});
+
 
 // Define the port address and tell express to use this port
 const port = process.env.PORT || '3000';

@@ -1,17 +1,24 @@
 <div class="panel panel-default" xmlns="http://www.w3.org/1999/html">
-    <div class="panel-heading">
-      <div class="row pad-all">
-        <h4 class="title margin-left-right">{{movie?.name}}</h4>
-        <div class="row pull-right margin-left-right btn-toolbar">
-          <a class="btn btn-primary" style="cursor: pointer;" (click)="onView();">View</a>
-          <a class="btn btn-info" style="cursor: pointer;" (click)="onEditMovie()">Edit</a>
-          <a class="btn btn-danger" style="cursor: pointer;" (click)="onDelete();">Delete</a>
-        </div>
+  <div class="panel-heading">
+    <div class="row pad-all">
+      <h4 class="title margin-left-right">{{movie?.name}}</h4>
+      <div class="row pull-right margin-left-right btn-toolbar">
+        <!-- <a class="btn btn-primary" style="cursor: pointer;" (click)="onView();">View</a> -->
+        <a class="btn btn-info" style="cursor: pointer;" (click)="onEditMovie()">Edit</a>
+        <a class="btn btn-danger" style="cursor: pointer;" (click)="onDelete();">Delete</a>
       </div>
     </div>
-    <div class="panel-body">
-      <div class="pad-left-right">
-        <div class="row">
-          <label>Description:</label>
-          <span class="label-value">{{ movie?.description }}</span>
-        </div>
+  </div>
+  <div class="panel-body">
+    <div class="pad-left-right">
+      <div class="row">
+        <label>Description: </label>
+        <span class="label-value">{{ movie?.description }}</span>
+      </div>
+      <div class="row">
+        <label>Rating: </label>
+        <span class="label-value">{{ movie?.rating }}</span>
+      </div>
+    </div>
+  </div>
+</div>

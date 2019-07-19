@@ -1,125 +1,132 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { Movie } from './movie.model';
 import { Subject } from 'rxjs';
-import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { Post } from './movie.model';
+import {HttpClient, HttpHeaders, HttpResponse, HttpRequest} from "@angular/common/http";
 
 
-@Injectable({providedIn: 'root'})
-export class  PostsService{
-  private posts: Post[] = [];
-  private postsUpdated = new Subject<Post []>();
-
-  constructor(private http: HttpClient) {}
-}
+@Injectable()
 export class MovieService {
-
-  constructor(private http: HttpClient) { }
-
-  movies: Movie[] = [];
-  maxMovieId: number;
-  movieSelected = new Subject<Movie>();
+  movieSelectedEvent = new EventEmitter<Movie[]>();
   movieListChangedEvent = new Subject<Movie[]>();
-  moviesListClone: Movie[];
+  maxMovieId: number;
+  movies: Movie[] = [];
+ 
 
-  getMovies() {
-    this.http
-    .get<Movie[]>('http://localhost:3000/movies')
-    .subscribe((movies: Movie[]) => {
-      this.movies = movies;
-      this.movies.sort(compareMoviesByID);
-      this.movieListChangedEvent.next(this.movies.slice());
-    }, (err: any) => {
-      console.error(err);
-    });
+
+  constructor(private http: HttpClient) { 
+    this.maxMovieId = this.getMaxId();
+    
   }
 
-  getMovie(id: string): Movie{
-    for (var i = 0; i < this.movies.length; i++) {
-      if (this.movies[i].id === id) {
-        return this.movies[i];
+  storeMovies(movies: Movie[]) {
+    const headers = new HttpHeaders ({'Content-Type': 'application/json'});
+    
+    this.http.put('http://localhost:3000/movies', movies, {headers: headers})
+    .subscribe(
+      (response: Response) => {
+        this.movieListChangedEvent.next(movies.slice())
+      }
+    )
+  }
+
+
+  getMovies(): Movie[] {
+    this.http.get<{message: String, movies: Movie[]}>('http://localhost:3000/movies')
+      .subscribe(
+        //success function
+        (movieData) => {
+          this.movies = movieData.movies;
+          this.maxMovieId = this.getMaxId();
+          this.movies.sort((a,b) => (a.name > b.name ) ? 1 : ((b.name > a.name) ? -1 : 0));
+          this.movieListChangedEvent.next(this.movies.slice())
+        });
+    //error function
+    (error: any) => {
+      console.log(error);
+    }
+    return this.movies.slice();
+  }
+
+  getMovie(id: string): Movie {
+    for(let movie of this.movies) {
+      if (movie.id === id) {
+        return movie;
       }
     }
     return null;
   }
 
   deleteMovie(movie: Movie) {
-    if (movie === null) {
+    if (movie === null || movie === undefined) {
       return;
     }
-    const pos = this.movies.indexOf(movie);
-    if (pos < 0) {
-      return;
-    }
-    //TODO: call http.delete
-    this.movies.splice(pos, 1);
-    this.moviesListClone = this.movies.slice();
-    // this.storeMovies();
-    this.movieListChangedEvent.next(this.moviesListClone);
+
+    this.http.delete('http://localhost:3000/movies/' + movie.id)
+      .subscribe(
+        (response: Response) => {
+          this.getMovies();
+  });
+
   }
 
-  addMovie(newMovie: Movie) {
-    if (newMovie == undefined || newMovie == null) {
-      return
+  
+  getMaxId(): number {
+    let maxId = 0;
+    for (let movie of this.movies){
+      const currentId = +movie.id;
+      if (currentId > maxId) {
+        maxId = currentId;
+      }
     }
-    this.maxMovieId++
-    newMovie.id = this.maxMovieId.toString();
-    this.movies.push(newMovie);
-    this.moviesListClone = this.movies.slice();
-    this.storeMovies();
-    this.movieListChangedEvent.next(this.moviesListClone);
+    return maxId;
+  }
+
+
+  addMovie(newMovie: Movie) {
+    if (!newMovie) {
+      return;
+    }
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+   
+
+    this.http.post<{message: String, movie: Movie}>('http://localhost:3000/movies', newMovie, { headers: headers })
+      .subscribe(
+        (responseData) => {
+          this.movies.push(responseData.movie);
+          this.movies.sort((a,b) => (a.name > b.name ) ? 1 : ((b.name > a.name) ? -1 : 0));
+          this.movieListChangedEvent.next(this.movies.slice());
+        });
   }
 
   updateMovie(originalMovie: Movie, newMovie: Movie) {
-    if (originalMovie == null || originalMovie == undefined || newMovie == null || newMovie == undefined) {
+    if (!originalMovie || !newMovie) {
       return;
     }
 
-    var pos = this.movies.indexOf(originalMovie);
+    const pos = this.movies.indexOf(originalMovie);
     if (pos < 0) {
       return;
     }
-    
-    newMovie.id = originalMovie.id;
-    this.movies[pos] = newMovie;
-    this.moviesListClone = this.movies.slice();
-    this.storeMovies();
-    this.movieListChangedEvent.next(this.moviesListClone);
-  }
 
-  getMaxID(): number {
-
-    let maxID = 0;
-
-    for (let movie of this.movies) {
-      let currentID = +movie.id;
-      if (currentID > maxID) {
-        maxID = currentID;
-      }
-    }
-
-    return maxID;
-  }
-
-  storeMovies() {
-    let json = JSON.stringify(this.movies);
-    let header = new HttpHeaders();
-    header.set('Content-Type', 'application/json');
-    this.http
-    .put('http://localhost:3000/movies', json, {
-      headers: header
-    }).subscribe(() => {
-      this.movieListChangedEvent.next(this.movies.slice());
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
     });
-  }
-}
 
-  function compareMoviesByID(lhs: Movie, rhs: Movie): number {
-    if (lhs.id < rhs.id) {
-      return -1;
-    } else if (lhs.id === rhs.id) {
-      return 0;
-    } else {
-      return 1;
-    }
+    const strMovie = JSON.stringify(newMovie);
+
+    this.http.put('http://localhost:3000/movies/' + originalMovie.id
+      , strMovie
+      , { headers: headers })
+      .subscribe(
+        (response: Response) => {
+          this.movies[pos] = newMovie;
+          this.movieListChangedEvent.next(this.movies.slice());
+        });
+
+        
   }
+
+}

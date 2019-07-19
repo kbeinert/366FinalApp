@@ -12,12 +12,12 @@ export class MovieListComponent implements OnInit, OnDestroy {
   movies: Movie[] = [];
   private subscription: Subscription;
   
-  constructor(private movieService: MovieService) {  
+  constructor(private moviesService: MovieService) {  
   }
 
   ngOnInit() {
-    this.movieService.getMovies();
-    this.subscription = this.movieService.movieListChangedEvent
+    this.moviesService.getMovies();
+    this.subscription = this.moviesService.movieListChangedEvent
       .subscribe((movies: Movie[])=> {
         this.movies = movies;
       })
